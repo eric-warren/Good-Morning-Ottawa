@@ -71,4 +71,4 @@ if __name__ == '__main__':
     task_thread = threading.Thread(target=scheduled_task, daemon=True)
     task_thread.start()
 
-    app.run(debug=True)
+    app.run(debug=True,port=80)
