@@ -47,22 +47,17 @@ function placeMarker(latlng) {
 }
 
 function loadTweets() {
-    const startDate = document.getElementById('start-date').value;
-    const endDate = document.getElementById('end-date').value;
+    const urlParams = new URLSearchParams(window.location.search);
+    const dateParam = urlParams.get('date');
+
+    const startDate = dateParam || document.getElementById('start-date').value;
+    const endDate = dateParam || document.getElementById('end-date').value;
     const categoryFilter = document.getElementById('category-filter').value;
 
-
     const url = new URL('/get_tweets', window.location.origin);
-    if (startDate) url.searchParams.append('start_date', startDate);
-    if (endDate) url.searchParams.append('end_date', endDate);
-    if (categoryFilter !== 'all') url.searchParams.append('category', categoryFilter);
-
-
-    // Show loading indicator
-    const loadingIndicator = document.getElementById('loading') || document.createElement('div');
-    loadingIndicator.id = 'loading';
-    loadingIndicator.textContent = 'Loading...';
-    document.body.appendChild(loadingIndicator);
+    url.searchParams.append('start_date', startDate);
+    url.searchParams.append('end_date', endDate);
+    url.searchParams.append('category', categoryFilter);
 
     fetch(url)
         .then(response => response.json())
@@ -71,7 +66,6 @@ function loadTweets() {
             currentTweetIndex = 0;
             if (tweets.length > 0) {
                 displayTweet();
-                updateNavigationButtons();
             } else {
                 displayNoTweetsMessage();
             }
@@ -79,17 +73,23 @@ function loadTweets() {
         .catch(error => {
             console.error('Error:', error);
             displayErrorMessage();
-        })
-        .finally(() => {
-            // Hide loading indicator
-            loadingIndicator.remove();
         });
 }
 
+function loadSpecificTweet(date) {
+    loadTweets(date);
+}
 document.getElementById('apply-filters').addEventListener('click', loadTweets);
 
-// Call loadTweets on page load to display initial tweets
-document.addEventListener('DOMContentLoaded', loadTweets);
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const date = urlParams.get('date');
+    if (date) {
+        loadSpecificTweet(date);
+    } else {
+        loadTweets();
+    }
+});
 
 function displayNoTweetsMessage() {
     const tweetContainer = document.getElementById('tweet-container');
@@ -193,6 +193,18 @@ document.getElementById('categorization-form').addEventListener('submit', functi
         alert('Failed to update category.');
     });
 });
+
+// Add this to ensure the date is set when the page loads
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const dateParam = urlParams.get('date');
+    if (dateParam) {
+        document.getElementById('start-date').value = dateParam;
+        document.getElementById('end-date').value = dateParam;
+    }
+    loadTweets();
+};
+
 
 initMap();
 loadTweets();

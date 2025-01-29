@@ -59,7 +59,8 @@ def scheduled_task():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    date = request.args.get('date')
+    return render_template('index.html', filter_date=date)
 
 @app.route('/get_tweets')
 def get_tweets():
@@ -100,7 +101,9 @@ def categorize():
 
 @app.route('/pictures')
 def pictures():
-    return render_template('pictures.html')
+    tweets = load_tweets()
+    tweets_with_images = [t for t in tweets if t.get('image_url')]
+    return render_template('pictures.html', tweets=tweets_with_images)
 
 # Add a new route for paginated images
 @app.route('/get_paginated_images')

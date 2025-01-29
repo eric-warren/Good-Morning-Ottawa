@@ -94,7 +94,11 @@
                         if (tweet.image_url) {
                             const imgElement = document.createElement('div');
                             imgElement.className = 'image-item';
-                            imgElement.innerHTML = `<img src="${tweet.image_url}" alt="Tweet image">`;
+                            imgElement.innerHTML = `
+                                <a href="/?date=${tweet.date}">
+                                    <img src="${tweet.image_url}" alt="Tweet image">
+                                </a>
+                            `;
                             imageGrid.appendChild(imgElement);
                         }
                     });
