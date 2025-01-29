@@ -37,6 +37,7 @@ def index():
 @app.route('/get_tweets')
 def get_tweets():
     tweets = load_tweets()
+    print(f"Retrieved {len(tweets)} tweets")
     filter_type = request.args.get('filter', 'all')
 
     if filter_type == 'uncategorized':
