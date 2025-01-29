@@ -1,2 +1,3 @@
 __pycache__
 parsed_tweets copy.json
+.env
