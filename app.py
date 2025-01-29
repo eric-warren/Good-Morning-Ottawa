@@ -68,7 +68,7 @@ def categorize():
         return jsonify(success=False), 404
 
 if __name__ == '__main__':
-    #task_thread = threading.Thread(target=scheduled_task, daemon=True)
-    #task_thread.start()
+    task_thread = threading.Thread(target=scheduled_task, daemon=True)
+    task_thread.start()
 
     app.run(debug=True)
