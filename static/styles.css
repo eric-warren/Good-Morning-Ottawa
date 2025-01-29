@@ -1,0 +1,118 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 10px;
+    background-color: #f4f4f9;
+    color: #333;
+    position: relative;
+}
+
+h1 {
+    text-align: center;
+    color: #444;
+    margin-bottom: 10px;
+}
+
+#filter-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    text-align: right;
+}
+
+#filter-container label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+#filter {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: auto;
+}
+#tweet-container {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#tweet-date {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+#tweet-image {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#map {
+    height: 300px;
+    width: 100%;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+#categorization-form {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#categorization-form label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#categorization-form select,
+#categorization-form button {
+    padding: 8px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-width: 300px;
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.navigation-buttons button {
+    padding: 8px 16px;
+    border-radius: 5px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.navigation-buttons button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.navigation-buttons button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+@media (max-width: 600px) {
+    .navigation-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .navigation-buttons button {
+        width: 100%;
+        max-width: 300px;
+        margin-bottom: 8px;
+    }
+}
+

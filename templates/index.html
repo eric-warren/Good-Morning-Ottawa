@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tweet Categorization</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+    <h1>Tweet Categorization</h1>
+    <div id="filter-container">
+        <label for="filter">Filter:</label>
+        <select id="filter">
+            <option value="all">All</option>
+            <option value="uncategorized">Uncategorized</option>
+            <option value="categorized">Categorized</option>
+        </select>
+    </div>
+    <div id="tweet-container">
+        <p id="tweet-date">Date: <span id="date-value"></span></p>
+        <img id="tweet-image" src="" alt="Tweet Image">
+    </div>
+    <div id="map" style="height: 400px;"></div>
+    <form id="categorization-form">
+        <input type="hidden" id="tweet-id" name="tweet-id">
+        <label for="category">Category:</label>
+        <select id="category" name="category">
+            <option value="">None</option>
+            <option value="NCC">NCC</option>
+            <option value="Ottawa">Ottawa</option>
+            <option value="Gatineau">Gatineau</option>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+    <div class="navigation-buttons">
+        <button id="back-button">Back</button>
+        <button id="next-button">Next</button>
+    </div>
+    <div id="loading" style="display: none;">Loading...</div>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</body>
+</html>
+
