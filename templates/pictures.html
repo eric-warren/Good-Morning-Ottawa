@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pictures</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .image-item img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+        .pagination {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .pagination button {
+            margin: 0 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pictures</h1>
+    <div>
+        <label for="page-size">Page Size:</label>
+        <select id="page-size">
+            <option value="12">12</option>
+            <option value="24">24</option>
+            <option value="48">48</option>
+        </select>
+    </div>
+    <div class="image-grid" id="image-grid"></div>
+    <div class="pagination">
+        <button id="prev-page">Previous</button>
+        <span id="page-info"></span>
+        <button id="next-page">Next</button>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let pageSize = 12;
+        let totalPages = 1;
+
+        function loadImages() {
+            fetch(`/get_paginated_images?page=${currentPage}&page_size=${pageSize}`)
+                .then(response => response.json())
+                .then(data => {
+                    const imageGrid = document.getElementById('image-grid');
+                    imageGrid.innerHTML = '';
+                    data.images.forEach(tweet => {
+                        if (tweet.image_url) {
+                            const imgElement = document.createElement('div');
+                            imgElement.className = 'image-item';
+                            imgElement.innerHTML = `<img src="${tweet.image_url}" alt="Tweet image">`;
+                            imageGrid.appendChild(imgElement);
+                        }
+                    });
+                    totalPages = data.total_pages;
+                    updatePagination();
+                });
+        }
+
+        function updatePagination() {
+            document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById('prev-page').disabled = currentPage === 1;
+            document.getElementById('next-page').disabled = currentPage === totalPages;
+        }
+
+        document.getElementById('prev-page').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                loadImages();
+            }
+        });
+
+        document.getElementById('next-page').addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                loadImages();
+            }
+        });
+
+        document.getElementById('page-size').addEventListener('change', (e) => {
+            pageSize = parseInt(e.target.value);
+            currentPage = 1;
+            loadImages();
+        });
+
+        loadImages();
+    </script>
+</body>
+</html>

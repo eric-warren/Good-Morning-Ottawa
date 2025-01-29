@@ -1,6 +1,6 @@
 import threading
 import time
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, url_for
 from pymongo import MongoClient
 import os
 from getSkeets import updateSkeets
@@ -48,7 +48,6 @@ def get_tweets():
         filtered_tweets = tweets
 
     return jsonify(filtered_tweets)
-
 @app.route('/categorize', methods=['POST'])
 def categorize():
     tweet_id = float(request.form.get('tweet-id'))
@@ -69,6 +68,31 @@ def categorize():
     else:
         return jsonify(success=False), 404
 
+@app.route('/pictures')
+def pictures():
+    return render_template('pictures.html')
+
+# Add a new route for paginated images
+@app.route('/get_paginated_images')
+def get_paginated_images():
+    page = int(request.args.get('page', 1))
+    page_size = int(request.args.get('page_size', 12))
+
+    tweets = load_tweets()
+    tweets_with_images = [t for t in tweets if t.get('image_url')]
+
+    total_images = len(tweets_with_images)
+    start_index = (page - 1) * page_size
+    end_index = start_index + page_size
+    paginated_images = tweets_with_images[start_index:end_index]
+
+    return jsonify({
+        'images': paginated_images,
+        'total_images': total_images,
+        'page': page,
+        'page_size': page_size,
+        'total_pages': (total_images + page_size - 1) // page_size
+    })
 if __name__ == '__main__':
     task_thread = threading.Thread(target=scheduled_task, daemon=True)
     task_thread.start()
