@@ -11,6 +11,7 @@ app = Flask(__name__)
 MONGO_URI = os.getenv("MONGO_URI")  # Store this in your .env file
 
 client = MongoClient(MONGO_URI)
+print(f"Connected to MongoDB: {client}")
 db = client.get_database("tweets_db")  # Replace with your database name
 collection = db.get_collection("tweets")  # Replace with your collection name
 
