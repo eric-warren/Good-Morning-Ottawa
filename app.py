@@ -15,9 +15,36 @@ print(f"Connected to MongoDB: {client}")
 db = client.get_database("tweets_db")  # Replace with your database name
 collection = db.get_collection("tweets")  # Replace with your collection name
 
-def load_tweets():
-    """Fetch all tweets from MongoDB."""
-    return list(collection.find({}, {"_id": 0}))  # Exclude MongoDB's default _id field
+def load_tweets(start_date=None, end_date=None, category=None):
+    """
+    Fetch tweets from MongoDB with optional date range and category filters.
+    
+    :param start_date: Start date for filtering (inclusive)
+    :param end_date: End date for filtering (inclusive)
+    :param category: Category to filter by
+    :return: List of filtered tweets
+    """
+    query = {}
+
+    # Add date range filter if provided
+    if start_date and end_date:
+        query['date'] = {'$gte': start_date, '$lte': end_date}
+    elif start_date:
+        query['date'] = {'$gte': start_date}
+    elif end_date:
+        query['date'] = {'$lte': end_date}
+
+    # Add category filter if provided
+    if category:
+        if category == 'uncategorized':
+            query['category'] = {'$in': [None, '']}
+        elif category == 'categorized':
+            query['category'] = {'$nin': [None, '']}
+        else:
+            query['category'] = category
+
+    # Fetch tweets based on the constructed query
+    return list(collection.find(query, {"_id": 0}))  # Exclude MongoDB's default _id field
 
 def save_tweets(tweet):
     """Update or insert a tweet into MongoDB."""
@@ -36,18 +63,21 @@ def index():
 
 @app.route('/get_tweets')
 def get_tweets():
-    tweets = load_tweets()
-    print(f"Retrieved {len(tweets)} tweets")
-    filter_type = request.args.get('filter', 'all')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    filter_type = request.args.get('category', 'all')
 
-    if filter_type == 'uncategorized':
-        filtered_tweets = [t for t in tweets if not t.get('category')]
-    elif filter_type == 'categorized':
-        filtered_tweets = [t for t in tweets if t.get('category')]
-    else:
-        filtered_tweets = tweets
 
-    return jsonify(filtered_tweets)
+    category = None
+    if filter_type in ['uncategorized', 'categorized']:
+        category = filter_type
+    elif filter_type != 'all':
+        category = filter_type
+
+    tweets = load_tweets(start_date, end_date, category)
+
+    return jsonify(tweets)
+
 @app.route('/categorize', methods=['POST'])
 def categorize():
     tweet_id = float(request.form.get('tweet-id'))
@@ -77,8 +107,17 @@ def pictures():
 def get_paginated_images():
     page = int(request.args.get('page', 1))
     page_size = int(request.args.get('page_size', 12))
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    filter_type = request.args.get('filter', 'all')
 
-    tweets = load_tweets()
+    category = None
+    if filter_type in ['uncategorized', 'categorized']:
+        category = filter_type
+    elif filter_type != 'all':
+        category = filter_type
+
+    tweets = load_tweets(start_date, end_date, category)
     tweets_with_images = [t for t in tweets if t.get('image_url')]
 
     total_images = len(tweets_with_images)
@@ -93,6 +132,7 @@ def get_paginated_images():
         'page_size': page_size,
         'total_pages': (total_images + page_size - 1) // page_size
     })
+
 if __name__ == '__main__':
     task_thread = threading.Thread(target=scheduled_task, daemon=True)
     task_thread.start()

@@ -36,7 +36,6 @@ def updateSkeets():
 
             # Check if the post is already stored in MongoDB
             existing_entry = collection.find_one({"date": created})
-
             if not existing_entry:
                 new_entry = {
                     "date": created,

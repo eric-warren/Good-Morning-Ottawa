@@ -47,15 +47,29 @@ function placeMarker(latlng) {
 }
 
 function loadTweets() {
-    const filter = document.getElementById('filter').value;
-    document.getElementById('loading').style.display = 'block';
-    fetch(`/get_tweets?filter=${filter}`)
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+    const categoryFilter = document.getElementById('category-filter').value;
+
+
+    const url = new URL('/get_tweets', window.location.origin);
+    if (startDate) url.searchParams.append('start_date', startDate);
+    if (endDate) url.searchParams.append('end_date', endDate);
+    if (categoryFilter !== 'all') url.searchParams.append('category', categoryFilter);
+
+
+    // Show loading indicator
+    const loadingIndicator = document.getElementById('loading') || document.createElement('div');
+    loadingIndicator.id = 'loading';
+    loadingIndicator.textContent = 'Loading...';
+    document.body.appendChild(loadingIndicator);
+
+    fetch(url)
         .then(response => response.json())
         .then(data => {
-            document.getElementById('loading').style.display = 'none';
-            if (Array.isArray(data) && data.length > 0) {
-                tweets = data;
-                currentTweetIndex = 0;
+            tweets = data;
+            currentTweetIndex = 0;
+            if (tweets.length > 0) {
                 displayTweet();
                 updateNavigationButtons();
             } else {
@@ -63,10 +77,19 @@ function loadTweets() {
             }
         })
         .catch(error => {
-            document.getElementById('loading').style.display = 'none';
+            console.error('Error:', error);
             displayErrorMessage();
+        })
+        .finally(() => {
+            // Hide loading indicator
+            loadingIndicator.remove();
         });
 }
+
+document.getElementById('apply-filters').addEventListener('click', loadTweets);
+
+// Call loadTweets on page load to display initial tweets
+document.addEventListener('DOMContentLoaded', loadTweets);
 
 function displayNoTweetsMessage() {
     const tweetContainer = document.getElementById('tweet-container');
@@ -133,7 +156,7 @@ document.getElementById('next-button').addEventListener('click', function() {
     }
 });
 
-document.getElementById('filter').addEventListener('change', loadTweets);
+//document.getElementById('filter').addEventListener('change', loadTweets);
 
 document.getElementById('categorization-form').addEventListener('submit', function(event) {
     event.preventDefault();

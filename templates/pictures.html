@@ -23,17 +23,43 @@
         .pagination button {
             margin: 0 0.5rem;
         }
+        .filter-container {
+            margin-bottom: 1rem;
+        }
+        .filter-container > * {
+            margin-right: 1rem;
+        }
     </style>
 </head>
 <body>
     <h1>Pictures</h1>
-    <div>
+    <div class="filter-container">
+        <label for="start-date">Start Date:</label>
+        <input type="date" id="start-date">
+
+        <label for="end-date">End Date:</label>
+        <input type="date" id="end-date">
+
+        <label for="category">Category:</label>
+        <select id="category">
+            <option value="all">All</option>
+            <option value="uncategorized">Uncategorized</option>
+            <option value="categorized">Categorized</option>
+            <option value="NCC">NCC</option>
+            <option value="Ottawa">Ottawa</option>
+            <option value="Gatineau">Gatineau</option>
+        </select>
         <label for="page-size">Page Size:</label>
         <select id="page-size">
-            <option value="12">12</option>
-            <option value="24">24</option>
-            <option value="48">48</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="40">40</option>
+            <option value="60">60</option>
+            <option value="80">80</option>
         </select>
+
+        <button id="apply-filters">Apply Filters</button>
     </div>
     <div class="image-grid" id="image-grid"></div>
     <div class="pagination">
@@ -44,11 +70,22 @@
 
     <script>
         let currentPage = 1;
-        let pageSize = 12;
+        let pageSize = 10;
         let totalPages = 1;
 
         function loadImages() {
-            fetch(`/get_paginated_images?page=${currentPage}&page_size=${pageSize}`)
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const category = document.getElementById('category').value;
+
+            const url = new URL('/get_paginated_images', window.location.origin);
+            url.searchParams.append('page', currentPage);
+            url.searchParams.append('page_size', pageSize);
+            if (startDate) url.searchParams.append('start_date', startDate);
+            if (endDate) url.searchParams.append('end_date', endDate);
+            if (category !== 'all') url.searchParams.append('filter', category);
+
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     const imageGrid = document.getElementById('image-grid');
@@ -92,7 +129,12 @@
             loadImages();
         });
 
+        document.getElementById('apply-filters').addEventListener('click', () => {
+            currentPage = 1;
+            loadImages();
+        });
         loadImages();
     </script>
 </body>
 </html>
+
